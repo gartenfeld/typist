@@ -1,0 +1,78 @@
+
+.container {
+  margin-top: 10%;
+  margin-left: 10%;
+}
+
+.avatar {
+
+  margin: 10px 10px 10px 20px;
+
+  background-image: url('31.4QSH.jpg');
+  
+  /* make a square container */
+  width: 60px;
+  height: 60px;
+
+  /* fill the container, preserving aspect ratio, and cropping to fit */
+  background-size: cover;
+  /* center the image vertically and horizontally */
+  background-position: center;
+  /* round the edges to a circle with border radius 1/2 container size */
+  border-radius: 50%;
+
+  border: 2px solid #FF8D15;
+
+  float: left;
+}
+
+.panel {
+  /* #FFCC66 */
+  background-color: #FFBD15;
+  margin: 0px 10px 10px -5px;
+  padding: 10px 10px 10px 10px;
+  height: 85px;
+  width: 400px;
+  border-radius: 5px;
+}
+
+.long-panel {
+  margin-top: -20px;
+  background-color: #444;
+  width: 405px;
+  height: 800px;
+  border-right: 2px solid #555;
+}
+
+body {
+  margin: 0;
+}
+
+.t {
+  width: 200px;
+  font-weight: bold;
+  float: left;
+  margin-top: 17px;
+  margin-left: 10px;
+  font-family: 'Arial';
+  color: #DD8D15;
+  font-size: 80%
+}
+
+.login {
+  float: left;
+  font-family: Arial, sans-serif;
+  margin-top: -6px;
+  margin-left: 10px;
+}
+
+.login a {
+  text-decoration: none;
+  color: #444;
+  /*text-shadow: 1px 1px 1px #CC7715;*/
+  font-weight: 400;
+}
+
+.login a:hover {
+  text-decoration: underline;
+}
