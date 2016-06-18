@@ -187,23 +187,22 @@ $(function() {
 
   ///// /////
 
-  function testUserAgent() {
-    var MOBILE_MARKERS = /Android|iPhone|iPad|iPod|Mobile|Mini|webOS/i;
-    function isMobile() {
-      return MOBILE_MARKERS.test(navigator.userAgent);
-    }
-    var MOBILE_MESSAGE = "Try this app on a computer with a keyboard.";
-    function displaySpecialMessage(message) {
-      renderSentence(tilesFromText(message));
-      $('.character').attr('class', 'character apparent');
-    }
-    if (isMobile()) {
-      displaySpecialMessage(MOBILE_MESSAGE);
-      return;
-    }
+  var MOBILE_MARKERS = /Android|iPhone|iPad|iPod|Mobile|Mini|webOS/i;
+  function isMobile() {
+    return MOBILE_MARKERS.test(navigator.userAgent);
   }
-
-  testUserAgent();
+  var MOBILE_MESSAGE = "Try this app on a computer with a keyboard.";
+  function displaySpecialMessage(message) {
+    renderSentence(tilesFromText(message));
+    $('.character').attr('class', 'character apparent blink');
+    $('.banner').hide();
+    $('.panel').hide();
+    $('#stage').css({marginLeft: '7%'});
+  }
+  if (isMobile()) {
+    displaySpecialMessage(MOBILE_MESSAGE);
+    return;
+  }
 
   ///// /////
 

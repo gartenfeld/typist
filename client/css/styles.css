@@ -118,6 +118,10 @@ body {
   animation: fade-in 1.4s infinite alternate;
 }
 
+.blink {
+  animation: fade-in 1.4s infinite alternate;
+}
+
 .character {
   display: inline-block;
   color: transparent;
