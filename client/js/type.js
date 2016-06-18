@@ -269,8 +269,6 @@ $(function() {
     }, 0);
   }
 
-window.next = onSentenceCompleted;
-
   function fetchEntryData() {
     var idx = Math.floor(Math.random() * window.VT.length);
     return window.VT[idx];
@@ -344,5 +342,10 @@ window.next = onSentenceCompleted;
   });
 
   loadAnotherEntry();
+
+  // Load the full data asynchronously
+  var payload = document.createElement('script');
+  payload.src = 'lib/vt.js';
+  document.head.appendChild(payload);
 
 });
