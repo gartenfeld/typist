@@ -314,10 +314,16 @@ $(function() {
     return false;
   }
 
-  function flashScreen () {
+  function flashScreen() {
     $Backdrop
       .animate({ opacity: 0.5 }, 50)
       .animate({ opacity: 0 }, 25);
+  }
+
+  function toggleAudio() {
+    soundManager.togglePause('voice');
+    var actionText = $Audio.paused ? 'resume' : 'pause';
+    $('#toggle-action').text(actionText);
   }
 
   // Prevent page navigation by backspacing
@@ -333,6 +339,10 @@ $(function() {
   $('body').keyup(function(ev) {
     var pressed = ev.which || ev.keyCode;
     ev.preventDefault(); 
+    if (pressed === 27) {
+      toggleAudio();
+      return;
+    }
     if (isAnswerCorrect(pressed)) {
       onCorrectKeyAnswer();
     } else if (pressed !== 32) {
