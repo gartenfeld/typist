@@ -1,0 +1,10 @@
+{
+  "firebase": "vok",
+  "public": "client",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/audio/**",
+    "**/node_modules/**"
+  ]
+}

@@ -8,7 +8,8 @@ $(function() {
 
   ///// Constants & Utilities /////
 
-  var RESOURCE_DIR = 'audio/';
+  // var RESOURCE_DIR = 'audio/';
+  var RESOURCE_DIR = 'https://dbx.firebaseapp.com/audio/vt/';
   var FILE_TYPE = '.ogg';
   var LINE_LIMIT = 36;
 
