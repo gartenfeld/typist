@@ -351,11 +351,18 @@ $(function() {
     }
   });
 
+  ///// Bootstraping Call /////
   loadAnotherEntry();
+  /////////////////////////////
 
   // Load the full data asynchronously
   var payload = document.createElement('script');
   payload.src = 'lib/vt.js';
   document.head.appendChild(payload);
+
+  /**
+   * Experimental Feature
+   */
+  // $Audio._a.playbackRate = 1
 
 });
