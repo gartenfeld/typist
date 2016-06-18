@@ -162,15 +162,8 @@ $(function() {
 
   var $Audio = soundManager.createSound({
     id: 'voice',
-    stream: true,
-    autoLoad: false,
-    autoPlay: false,
     volume: 60,
-    onload: function() {
-      this.play({
-        loops: 200
-      });
-    }
+    stream: true
   });
 
   var $Focus;
@@ -181,11 +174,11 @@ $(function() {
   var $Tokens = TokensService();
 
   function onWord(token) {
-
+    // /* */ console.log('Parsed: ' + token.string);
   }
 
   function onWordComplete(token) {
-
+    // /* */ console.log('Completed: ' + token.string);
   }
 
   $Tokens.onToken(onWord);
@@ -286,14 +279,14 @@ window.next = onSentenceCompleted;
   function loadAnotherEntry() {
     var entry = fetchEntryData();
     $Tokens.reset();
-    $Audio.load({
-      url: RESOURCE_DIR + entry.f + FILE_TYPE
+    $Audio.play({ 
+      url: RESOURCE_DIR + entry.f + FILE_TYPE,
+      loops: 200
     });
     $Translation.text(entry.en);
     var marquee = tilesFromText(entry.de);
     renderSentence(marquee);
     nextAction();
-
   }
 
   // ß: 189 ½ -
