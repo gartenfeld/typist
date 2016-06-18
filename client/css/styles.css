@@ -1,26 +1,27 @@
-/*@import url(http://fonts.googleapis.com/css?family=Vollkorn:400);*/
+/*
+@import url(http://fonts.googleapis.com/css?family=Vollkorn:400);
+*/
 @import url(https://fonts.googleapis.com/css?family=Droid+Sans+Mono);
 
-.container {
-  margin-top: 10%;
-  margin-left: 10%;
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  box-sizing: border-box;
 }
 
 .avatar {
-
   margin: 10px 10px 10px 20px;
-
-  background-image: url('../img/puppy.jpg');
-  
-  /* make a square container */
+  background-image: url('../img/puppy.jpg');  
   width: 60px;
   height: 60px;
-
-  /* fill the container, preserving aspect ratio, and cropping to fit */
   background-size: cover;
-  /* center the image vertically and horizontally */
   background-position: center;
-  /* round the edges to a circle with border radius 1/2 container size */
   border-radius: 50%;
 
   border: 2px solid #FF8D15;
@@ -82,44 +83,29 @@ body {
 }
 
 
-*, *:before, *:after {
-  box-sizing: inherit;
-}
 
-html, body, #warning {
-  margin: 0;
+
+#backdrop {
+  position: fixed;
+  left: 0; top: 0;
   width: 100%;
   height: 100%;
-  position: fixed;
-  box-sizing: border-box;
-}
-
-#warning {
-  left: 0;
-  top: 0;
   opacity: 0;
-  background-color: #FFC2D6;
+  background-color: #FFBD15;
 }
 
 body {
   background-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   overflow: hidden;
 }
 
-hr {
-  /*clear: both;*/
-}
-
 .container {
-/*  margin: 20% auto;*/
-/*  max-width: 900px;
-  min-width: 890px;*/
+  margin-top: 10%;
   margin-left: 350px;
   width: 70%;
 }
@@ -133,16 +119,18 @@ hr {
   padding-left: 20px;
   margin-top: 1em;
   font-size: 1.2em;
-  font-family: 'Arial';
+  font-family: 'Droid Sans Mono';
   color: #ccc;
 }
 
-.line {
-  clear:both;
+@keyframes fade-in { 
+  0% { opacity: 0; }
+  30% { opacity: 1; }
 }
 
-.current.current {
-  background-color: #FFB84D;
+.character.caret {
+  background-color: #FFBD15;
+  animation: fade-in 1.4s infinite alternate;
 }
 
 .character {
@@ -155,7 +143,7 @@ hr {
   margin: 0px 1px 25px 1px;
   padding-top: 2px;
   padding-bottom: 0px;
-  border-bottom: 3px #000 solid;
+  border-bottom: 3px #444 solid;
   border-radius: 3px;
   font-size: 2em;
   font-family: "Droid Sans Mono", Serif;
@@ -163,14 +151,14 @@ hr {
   vertical-align: text-bottom;
 }
 
-.shown {
+.apparent {
   color: #000;
   background-color: transparent;
-  border-bottom: 3px transparent solid;
+  border-bottom-color: transparent;
 }
 
 hr {
-  border: 0;
+  border: none;
   height: 1px;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.05));
 }

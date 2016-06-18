@@ -1,3 +1,9 @@
+soundManager.setup({
+  url: 'lib/swf/',
+  flashVersion: 9,
+  preferFlash: false,
+});
+
 $(function() {
 
   ///// Constants & Utilities /////
@@ -6,36 +12,206 @@ $(function() {
   var FILE_TYPE = '.ogg';
   var LINE_LIMIT = 36;
 
-  var MOBILE_MARKERS = /Android|iPhone|iPad|iPod|Mobile|Mini|webOS/i;
+  ///// Modules /////
 
-  function isMobile() {
-    return MOBILE_MARKERS.test(navigator.userAgent);
+  var ANY_EN_LETTER = /^[a-zA-Z]$/;
+  var AND_DE_LETTER = /^[\u00C4\u00E4\u00D6\u00F6\u00DC\u00FC\u00DF]$/;
+
+  function isAlpha(char) {
+    return ANY_EN_LETTER.test(char) || AND_DE_LETTER.test(char);
   }
 
-  var MOBILE_MESSAGE = "Try this app on a computer with a keyboard.";
+  ///// Tile Class /////
 
-  function displaySpecialMessage(message) {
-    renderSentence(processSentence(message));
-    $('.character').attr('class', 'character shown');
+  function Tile(params) {
+    this.id = params.id;
+    this.char = params.char;
+    this.parent = params.parent;
+    this.isLast = params.isLast;
+    this.$el = $('<div></div>').text(params.char);
+    this.$el.attr('data-id', this.id);
+    this.$el.addClass(this.classes.base);
+    this.hide();
   }
 
-  if (isMobile()) {
-    displaySpecialMessage(MOBILE_MESSAGE);
-    return;
+  Tile.prototype.classes = {
+    base: 'character',
+    current: 'caret',
+    hidden: 'opaque',
+    shown: 'apparent'
+  };
+
+  Tile.prototype.hide = function() {
+    this.$el.removeClass(this.classes.shown);
+    this.$el.addClass(this.classes.hidden);
+    return this;
+  };
+
+  Tile.prototype.show = function() {
+    this.$el.removeClass(this.classes.hidden);
+    this.$el.addClass(this.classes.shown);
+    if (this.isLast && this.parent) {
+      this.parent.triggerComplete();
+    }
+    return this;
+  };
+
+  Tile.prototype.focus = function() {
+    this.$el.addClass(this.classes.current);
+    return this;
+  };
+
+  Tile.prototype.unfocus = function() {
+    this.$el.removeClass(this.classes.current);
+    return this;
+  };
+
+  ///// Token Class /////
+
+  function Token(string) {
+    this.string = string;
+    this.tiles = [];
+    this._onComplete = function() {};
   }
 
-  ///// App Variables /////
+  Token.prototype.onComplete = function(callback) {
+    if (typeof callback === 'function') {
+      this._onComplete = callback;
+    }
+  };
 
-  var $Audio;
+  Token.prototype.triggerComplete = function() {
+    this._onComplete(this);
+  };
 
-  var $Letter = '';
+  ///// TokensService /////
+
+  function TokensService() {
+
+    var _tileMapping = {};
+    var _idOffset = 0;
+    var _onToken = function() {};
+    var _onTokenComplete = function() {};
+
+    var makeTile = function(char, parent, isLast) {
+      var params = {
+        id: _idOffset,
+        char: char,
+        parent: parent || null,
+        isLast: isLast || false
+      };
+      var tile = new Tile(params);
+      _tileMapping[tile.id] = tile;
+      _idOffset++;
+      return tile;
+    };
+
+    var makeToken = function(string) {
+      if (!string) { return []; }
+      var token = new Token(string);
+      token.tiles = string.split('')
+        .map(function(char, i) {
+          var isLast = i === string.length - 1;
+          var tile = makeTile(char, token, isLast);
+          return tile;
+        });
+      token.onComplete(_onTokenComplete);
+      _onToken(token);
+      return token.tiles;
+    };
+
+    var makeLine = function(text) {
+      var tiles = [];
+      var token = '';
+      var chars = text.split('');
+      chars.forEach(function(char) {
+        if (isAlpha(char)) {
+          token += char;
+        } else {
+          tiles = tiles.concat(makeToken(token));
+          tiles.push(makeTile(char).show());
+          token = '';
+        }
+      });
+      return tiles.concat(makeToken(token));
+    };
+
+    return {
+      reset: function() {
+        _tileMapping = {};
+        _idOffset = 0;
+      },
+      onTokenComplete: function(callback) {
+        if (typeof callback === 'function') {
+          _onTokenComplete = callback;
+        }
+      },
+      onToken: function(callback) {
+        if (typeof callback === 'function') {
+          _onToken = callback;
+        }
+      },
+      getTileById: function(id) {
+        return _tileMapping[id];
+      },
+      makeTilesForLine: makeLine
+    };
+  }
+
+  ///// App Globals /////
+
+  var $Audio = soundManager.createSound({
+    id: 'voice',
+    stream: true,
+    autoLoad: false,
+    autoPlay: false,
+    volume: 60,
+    onload: function() {
+      this.play({
+        loops: 200
+      });
+    }
+  });
+
+  var $Focus;
   var $Sentence = $('#sentence');
   var $Translation = $('#translation');
+  var $Backdrop = $('#backdrop');
 
-  /**
-   * TO-DO: Replace with CSS loop animation
-   */
-  var $Blinker = {};
+  var $Tokens = TokensService();
+
+  function onWord(token) {
+
+  }
+
+  function onWordComplete(token) {
+
+  }
+
+  $Tokens.onToken(onWord);
+  $Tokens.onTokenComplete(onWordComplete);
+
+  ///// /////
+
+  function testUserAgent() {
+    var MOBILE_MARKERS = /Android|iPhone|iPad|iPod|Mobile|Mini|webOS/i;
+    function isMobile() {
+      return MOBILE_MARKERS.test(navigator.userAgent);
+    }
+    var MOBILE_MESSAGE = "Try this app on a computer with a keyboard.";
+    function displaySpecialMessage(message) {
+      renderSentence(tilesFromText(message));
+      $('.character').attr('class', 'character apparent');
+    }
+    if (isMobile()) {
+      displaySpecialMessage(MOBILE_MESSAGE);
+      return;
+    }
+  }
+
+  testUserAgent();
+
+  ///// /////
 
   function wrapText(text, limit) {
     var lines = [];
@@ -49,23 +225,12 @@ $(function() {
     return lines.concat(text);
   }
 
-  function processSentence(sentence) {
+
+  function tilesFromText(sentence) {
     var lines = wrapText(sentence, LINE_LIMIT);
     return lines.map(function(line) {
-      return line.split('');
+      return $Tokens.makeTilesForLine(line);
     });
-  }
-
-  var ANY_EN_LETTER = /^[a-zA-Z]$/;
-  var AND_DE_LETTER = /^[\u00C4\u00E4\u00D6\u00F6\u00DC\u00FC\u00DF]$/;
-
-  function isAlpha(char) {
-    return ANY_EN_LETTER.test(char) || AND_DE_LETTER.test(char);
-  }
-
-  function makeCharElement(char) {
-    var classes = 'character ' + (isAlpha(char) ? 'hidden' : 'shown');
-    return $('<div></div>').text(char).addClass(classes);
   }
 
   function renderSentence(lines) {
@@ -73,17 +238,16 @@ $(function() {
     lines.forEach(function(line, l) {
       $line = $('<div></div>', {class: 'line'});
       $Sentence.append($line);
-      line.forEach(function(char, c) {
-        $char = makeCharElement(char);
-        $char.appendTo($line);
-        $char.hide()
-          .delay(50 * l + 5 * c).fadeIn(200); 
+      line.forEach(function(tile, c) {
+        tile.$el.appendTo($line);
+        tile.$el.hide()
+          .delay(100 * l + 10 * c).fadeIn(200); 
       });
     });
   }
 
   function nextAction() {
-    var $tile = $('.character.hidden').first();
+    var $tile = $('.character.opaque').first();
     if ($tile.length) {
       setFocusOn($tile);
     } else {
@@ -91,25 +255,28 @@ $(function() {
     }
   }
 
-  function setFocusOn($char) {
-    $char.attr('class', 'character current');
-    $Letter = $char.text().toUpperCase();
-    $Blinker.$el = $char;
-    $Blinker.timer = setInterval(function(){
-      $char.fadeOut(400).fadeIn(400);
-    }, 2000);
+  function setFocusOn($tile) {
+    var id = $tile.attr('data-id');
+    var tile = $Tokens.getTileById(id);
+    $Focus = tile.focus();
   }
 
   function onCorrectKeyAnswer() {
-    clearInterval($Blinker.timer);
-    $Blinker.$el.attr('class', 'character shown');
+    $Focus.show().unfocus();
     nextAction();
   }
 
   function onSentenceCompleted() {
     $Audio.stop();
-    $Audio.play(loadAnotherEntry);
+    var timer = setTimeout(function() {
+      clearTimeout(timer);
+      $Audio.play({
+        onfinish: loadAnotherEntry
+      });
+    }, 0);
   }
+
+window.next = onSentenceCompleted;
 
   function fetchEntryData() {
     var idx = Math.floor(Math.random() * window.VT.length);
@@ -118,13 +285,15 @@ $(function() {
 
   function loadAnotherEntry() {
     var entry = fetchEntryData();
-    $Audio.unload();
-    $Audio.urls([RESOURCE_DIR + entry.f + FILE_TYPE]);
+    $Tokens.reset();
+    $Audio.load({
+      url: RESOURCE_DIR + entry.f + FILE_TYPE
+    });
     $Translation.text(entry.en);
-    var marquee = processSentence(entry.de);
+    var marquee = tilesFromText(entry.de);
     renderSentence(marquee);
-    $Audio.play();
     nextAction();
+
   }
 
   // ß: 189 ½ -
@@ -134,28 +303,30 @@ $(function() {
   // Z <==> Y
 
   var KEY_MAP = {
-     89: 'Z',
-     90: 'Y',
-    186: 'Ö',
-    189: 'SS',
-    219: 'Ü',
-    222: 'Ä'
+     89: 'z',
+     90: 'y',
+    186: 'ö',
+    189: 'ß',
+    219: 'ü',
+    222: 'ä'
   };
 
   function isAnswerCorrect(which) {
-    if (String.fromCharCode(which) === $Letter) {
+    var truth = $Focus.char.toLowerCase();
+    var asserted = String.fromCharCode(which);
+    if (asserted.toLowerCase() === truth) {
       return true;
     }
-    if (KEY_MAP[which] === $Letter) {
+    if (KEY_MAP[which] === truth) {
       return true;
     }
     return false;
   }
 
   function flashScreen () {
-    $('#warning')
+    $Backdrop
       .animate({ opacity: 0.5 }, 50)
-      .animate({ opacity: 0 }, 50);
+      .animate({ opacity: 0 }, 25);
   }
 
   // Prevent page navigation by backspacing
@@ -170,28 +341,15 @@ $(function() {
   // Space: 32
   $('body').keyup(function(ev) {
     var pressed = ev.which || ev.keyCode;
-
     ev.preventDefault(); 
     if (isAnswerCorrect(pressed)) {
       onCorrectKeyAnswer();
     } else if (pressed !== 32) {
       flashScreen(); 
-      console.log(pressed, $Letter);
+      /* */ console.log(pressed + '≠' + $Focus.char);
     }
-
   });
 
   loadAnotherEntry();
 
 });
-
-
-
-
-
-
-
-
-
-
-
