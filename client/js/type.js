@@ -1,7 +1,6 @@
 soundManager.setup({
   url: 'lib/swf/',
-  flashVersion: 9,
-  preferFlash: false,
+  preferFlash: false
 });
 
 $(function() {
@@ -10,7 +9,7 @@ $(function() {
 
   var RESOURCE_DIR = 'https://dbx.firebaseapp.com/audio/vt/';
   var FULL_DATA_PATH = 'lib/vt.js';
-  var FILE_TYPE = '.ogg';
+  var FILE_TYPE = '.mp3';
   var LINE_LIMIT = 36;
 
   ///// Modules /////

@@ -1,6 +1,8 @@
 node_modules
 .DS_Store
-audio/
+audio
+swf/
 *.min.js
+*.full.js
 sample.js
 vt.js
