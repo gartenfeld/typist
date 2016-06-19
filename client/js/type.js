@@ -305,6 +305,7 @@ $(function() {
      59: 'ö',
      89: 'z',
      90: 'y',
+    173: 'ß',
     186: 'ö',
     189: 'ß',
     219: 'ü',
@@ -378,7 +379,7 @@ $(function() {
     39: loadAnotherEntry
   };
 
-  $('body').keyup(function(ev) {
+  $('body').keydown(function(ev) {
     ev.preventDefault();
     var pressed = ev.which || ev.keyCode;
     if (IGNORE_KEYS[pressed]) {
