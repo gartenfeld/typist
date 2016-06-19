@@ -86,6 +86,7 @@ body {
   width: 100%;
   height: 100%;
   opacity: 0;
+  transition: opacity 0.05s;
   background-color: #FFBD15;
 }
 
@@ -152,4 +153,53 @@ hr {
   width: 870px;
   margin-left: 0;
   background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+}
+
+.hint {
+  position: fixed;
+  top: 57px;
+  left: 413px;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.hint--letter {
+  display: inline-block;
+  vertical-align: -4%;
+  margin-right: 20px;
+  color: #aaa;
+  font-size: 2em;
+  font-family: "Droid Sans Mono", Serif;
+}
+
+.hint--key {
+  display: inline-block;
+  text-align: center;
+  width: 44px;
+  height: 41px;
+  margin: 10px;
+  background: #eee;
+  border-radius: 4px;
+  border-top: 1px solid #eee;
+  box-shadow: 
+    inset 0 0 25px #eee,
+    0 1px 0 #ccc,
+    0 1px 3px #555;
+ }
+
+.hint--key span {
+  display: block;
+  margin: 3px;
+  color: #777;
+  font: normal 12px 'Arial';
+  text-shadow: 0px 0px 0.2px gray;
+}
+
+span.lower {
+  margin: 5px 0 0 0;
+}
+
+span.raise {
+  margin: 1px 0 5px 0;
 }

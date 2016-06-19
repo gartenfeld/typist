@@ -8,8 +8,8 @@ $(function() {
 
   ///// Constants & Utilities /////
 
-  // var RESOURCE_DIR = 'audio/';
   var RESOURCE_DIR = 'https://dbx.firebaseapp.com/audio/vt/';
+  var FULL_DATA_PATH = 'lib/vt.js';
   var FILE_TYPE = '.ogg';
   var LINE_LIMIT = 36;
 
@@ -254,11 +254,6 @@ $(function() {
     $Focus = tile.focus();
   }
 
-  function onCorrectKeyAnswer() {
-    $Focus.show().unfocus();
-    nextAction();
-  }
-
   function onSentenceCompleted() {
     $Audio.stop();
     var timer = setTimeout(function() {
@@ -287,6 +282,19 @@ $(function() {
     nextAction();
   }
 
+  var hideElement = (function() {
+    var timers = {};
+    return function timer(key, delay, $el) {
+      if (timers[key]) {
+        clearTimeout(timers[key]);
+      }
+      timers[key] = setTimeout(function() {
+        $el.css({ opacity: 0 });
+        clearTimeout(timers[key]);
+      }, delay);
+    };
+  })();
+
   // ß: 189 ½ -
   // Ä: 222 Þ '
   // Ö: 186 º ;
@@ -314,10 +322,42 @@ $(function() {
     return false;
   }
 
+  function onCorrectAnswer() {
+    $Focus.show().unfocus();
+    nextAction();
+  }
+
   function flashScreen() {
-    $Backdrop
-      .animate({ opacity: 0.5 }, 50)
-      .animate({ opacity: 0 }, 25);
+    $Backdrop.css({ opacity: 0.5 });
+    hideElement('backdrop', 45, $Backdrop);
+  }
+
+  var DE_KEYS = {
+    'ä': '<span class="lower">"</span><span>\'</span>',
+    'ö': '<span>:</span><span>;</span>',
+    'ü': '<span>{</span><span>[</span>',
+    'ß': '<span class="raise">_</span><span>-</span>'
+  };
+
+  var $HintLetter = $('.hint--letter');
+  var $HintKey = $('.hint--key');
+  var $Hint = $('.hint');
+
+  function showHint() {
+    $Hint.css({ opacity: 1 });
+    hideElement('hint', 2000, $Hint);
+  }
+
+  function onIncorrectKey(which) {
+    var truth = $Focus.char.toLowerCase();
+    var markup = DE_KEYS[truth];
+    if (markup) {
+      $HintLetter.text(truth);
+      $HintKey.html(markup);
+      showHint();
+      return;
+    }
+    flashScreen(); 
   }
 
   function toggleAudio() {
@@ -325,30 +365,33 @@ $(function() {
     var actionText = $Audio.paused ? 'resume' : 'pause';
     $('#toggle-action').text(actionText);
   }
+  
+  var IGNORE_KEYS = {
+     8: 'Backspace',
+    13: 'Enter',
+    32: 'Space'
+  };
 
-  // Prevent page navigation by backspacing
-  $(document)
-    .unbind('keydown')
-    .bind('keydown', function(ev) {
-      if (ev.keyCode === 8) { 
-        ev.preventDefault(); 
-      }
-  });
+  var CONTROLS = {
+    27: toggleAudio,
+    39: loadAnotherEntry
+  };
 
-  // Space: 32
   $('body').keyup(function(ev) {
+    ev.preventDefault();
     var pressed = ev.which || ev.keyCode;
-    ev.preventDefault(); 
-    if (pressed === 27) {
-      toggleAudio();
+    if (IGNORE_KEYS[pressed]) {
+      return;
+    }
+    if (CONTROLS[pressed]) {
+      CONTROLS[pressed]();
       return;
     }
     if (isAnswerCorrect(pressed)) {
-      onCorrectKeyAnswer();
-    } else if (pressed !== 32) {
-      flashScreen(); 
-      /* */ console.log(pressed + '≠' + $Focus.char);
+      onCorrectAnswer();
+      return;
     }
+    onIncorrectKey(pressed);
   });
 
   ///// Bootstraping Call /////
@@ -357,7 +400,7 @@ $(function() {
 
   // Load the full data asynchronously
   var payload = document.createElement('script');
-  payload.src = 'lib/vt.js';
+  payload.src = FULL_DATA_PATH;
   document.head.appendChild(payload);
 
   /**
