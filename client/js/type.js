@@ -217,7 +217,6 @@ $(function() {
     return lines.concat(text);
   }
 
-
   function tilesFromText(sentence) {
     var lines = wrapText(sentence, LINE_LIMIT);
     return lines.map(function(line) {
@@ -302,6 +301,7 @@ $(function() {
 
   var KEY_MAP = {
      59: 'ö',
+     63: 'ß',
      89: 'z',
      90: 'y',
     173: 'ß',
@@ -319,6 +319,9 @@ $(function() {
     }
     if (KEY_MAP[which] === truth) {
       return true;
+    }
+    if (which === 0) {
+      return true; // German keyboard on Firefox
     }
     return false;
   }
@@ -380,7 +383,10 @@ $(function() {
   };
 
   function isIgnoredKey(which) {
-    return (which < 65 || which > 90) && !KEY_MAP[which];
+    if (which === 0 || KEY_MAP[which]) {
+      return false;
+    }
+    return which < 65 || which > 90;
   }
 
   $('body').keydown(function(ev) {
