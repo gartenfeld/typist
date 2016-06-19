@@ -323,7 +323,10 @@ $(function() {
     return false;
   }
 
+  var $ErrorCount = 0;
+
   function onCorrectAnswer() {
+    $ErrorCount = 0;
     $Focus.show().unfocus();
     nextAction();
   }
@@ -358,6 +361,11 @@ $(function() {
       showHint();
       return;
     }
+    if ($ErrorCount > 2) {
+      onCorrectAnswer();
+      return;
+    }
+    $ErrorCount++;
     flashScreen(); 
   }
 
