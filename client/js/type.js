@@ -311,7 +311,7 @@ $(function() {
     222: 'ä'
   };
 
-  function isAnswerCorrect(which) {
+  function isCorrectKey(which) {
     var truth = $Focus.char.toLowerCase();
     var asserted = String.fromCharCode(which);
     if (asserted.toLowerCase() === truth) {
@@ -325,7 +325,7 @@ $(function() {
 
   var $ErrorCount = 0;
 
-  function onCorrectAnswer() {
+  function onCorrectKey() {
     $ErrorCount = 0;
     $Focus.show().unfocus();
     nextAction();
@@ -354,15 +354,14 @@ $(function() {
 
   function onIncorrectKey(which) {
     var truth = $Focus.char.toLowerCase();
-    var markup = DE_KEYS[truth];
-    if (markup) {
+    if (truth in DE_KEYS) {
       $HintLetter.text(truth);
-      $HintKey.html(markup);
+      $HintKey.html(DE_KEYS[truth]);
       showHint();
       return;
     }
     if ($ErrorCount > 2) {
-      onCorrectAnswer();
+      onCorrectKey();
       return;
     }
     $ErrorCount++;
@@ -374,30 +373,28 @@ $(function() {
     var actionText = $Audio.paused ? 'resume' : 'pause';
     $('#toggle-action').text(actionText);
   }
-  
-  var IGNORE_KEYS = {
-     8: 'Backspace',
-    13: 'Enter',
-    32: 'Space'
-  };
 
   var CONTROLS = {
     27: toggleAudio,
     39: loadAnotherEntry
   };
 
+  function isIgnoredKey(which) {
+    return (which < 65 || which > 90) && !KEY_MAP[which];
+  }
+
   $('body').keydown(function(ev) {
     ev.preventDefault();
     var pressed = ev.which || ev.keyCode;
-    if (IGNORE_KEYS[pressed]) {
-      return;
-    }
-    if (CONTROLS[pressed]) {
+    if (pressed in CONTROLS) {
       CONTROLS[pressed]();
       return;
     }
-    if (isAnswerCorrect(pressed)) {
-      onCorrectAnswer();
+    if (isIgnoredKey(pressed)) {
+      return;
+    }
+    if (isCorrectKey(pressed)) {
+      onCorrectKey();
       return;
     }
     onIncorrectKey(pressed);
