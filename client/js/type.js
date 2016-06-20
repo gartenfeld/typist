@@ -11,7 +11,7 @@ $(function() {
   var FULL_DATA_PATH = 'lib/vt.js';
   var FILE_TYPE = '.mp3';
   var LINE_LIMIT = 36;
-  var HISTORY_LIMIT = 17;
+  var HISTORY_LIMIT = 18;
 
   ///// Modules /////
 
