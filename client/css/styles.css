@@ -17,7 +17,6 @@ html, body {
 
 body {
   background-color: transparent;
-  -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -70,7 +69,7 @@ body {
   /*text-shadow: 1px 1px 1px #CC7715;*/
 }
 
-.panel {
+#panel {
   position: fixed;
   background-color: #444;
   width: 300px;
@@ -78,6 +77,46 @@ body {
   box-shadow: inset -10px 0 10px -5px #333;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
+}
+
+#history {
+  margin: 120px 10px;
+  padding: 0;
+  height: 80%;
+  overflow: hidden;
+  text-align: center;
+  list-style: none;
+}
+
+.word {
+  color: #ddd;
+  font-size: 1em;
+  font-family: 'Droid Sans Mono', 'Arial';
+  width: 240px;
+  margin: 0 20px 15px 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px #111;
+  cursor: pointer;
+}
+
+.word:hover {
+  color: #fff;
+  font-weight: bold;
+}
+
+.word:active {
+  padding-left: 1px;
+}
+
+.word--muted {
+  color: gray;
+  text-shadow: 1px 1px #333;
+}
+
+.word--muted:hover {
+  color: gray;
 }
 
 #backdrop {
@@ -164,7 +203,7 @@ hr {
   transition: opacity 1s;
 }
 
-.hint--letter {
+.hint__letter {
   display: inline-block;
   vertical-align: -4%;
   margin-right: 20px;
@@ -173,7 +212,7 @@ hr {
   font-family: "Droid Sans Mono", Serif;
 }
 
-.hint--key {
+.hint__key {
   display: inline-block;
   text-align: center;
   width: 44px;
@@ -188,7 +227,7 @@ hr {
     0 1px 3px #555;
  }
 
-.hint--key span {
+.hint__key span {
   display: block;
   margin: 3px;
   color: #777;

@@ -11,6 +11,7 @@ $(function() {
   var FULL_DATA_PATH = 'lib/vt.js';
   var FILE_TYPE = '.mp3';
   var LINE_LIMIT = 36;
+  var HISTORY_LIMIT = 17;
 
   ///// Modules /////
 
@@ -66,11 +67,47 @@ $(function() {
     return this;
   };
 
+  ///// History Items /////
+
+  function Word(string) {
+    this.string = string;
+    this.key = string.toLowerCase();
+    this.$el = $('<div></div>').text(string);
+    this.$el.on('click', this.toggleState.bind(this));
+    this.render();
+  }
+
+  Word.prototype.render = function() {
+    var classes = 'word' + (this.isActive() ? '' : ' word--muted');
+    this.$el.attr('class', classes);
+  };
+
+  Word.prototype.getLocalState = function() {
+    return localStorage.getItem('vt.' + this.key);
+  };
+
+  Word.prototype.setLocalState = function(state) {
+    localStorage.setItem('vt.' + this.key, state);
+  };
+
+  Word.prototype.isActive = function() {
+    var local = this.getLocalState();
+    if (local) {
+      return local === 'false' ? false : true;
+    }
+    return this.key in window.STOP_WORDS ? false: true;
+  };
+
+  Word.prototype.toggleState = function() {
+    this.setLocalState(!this.isActive());
+    this.render();
+  };
+
   ///// Token Class /////
 
   function Token(string) {
-    this.string = string;
     this.tiles = [];
+    this.word = new Word(string);
     this._onComplete = function() {};
   }
 
@@ -82,6 +119,12 @@ $(function() {
 
   Token.prototype.triggerComplete = function() {
     this._onComplete(this);
+  };
+
+  Token.prototype.reveal = function() {
+    this.tiles.forEach(function(tile) {
+      tile.show();
+    });
   };
 
   ///// TokensService /////
@@ -170,15 +213,37 @@ $(function() {
   var $Sentence = $('#sentence');
   var $Translation = $('#translation');
   var $Backdrop = $('#backdrop');
+  var $History = $('#history');
 
   var $Tokens = TokensService();
 
+  var capHistoryLength = (function() {
+    var $last;
+    return function capHistoryLength() {
+      if ($last) { $last.remove(); }
+      var words = $History.find('.word');
+      if (words.length > HISTORY_LIMIT) {
+        $last = words.last();
+        $last.fadeOut();
+      }
+    };
+  })();
+
+  function addToHistory(word) {
+    capHistoryLength();
+    $History.prepend(word.$el.hide());
+    word.$el.slideDown();
+  }
+
   function onWord(token) {
-    // /* */ console.log('Parsed: ' + token.string);
+    if (!token.word.isActive()) {
+      token.reveal();
+      addToHistory(token.word);
+    }
   }
 
   function onWordComplete(token) {
-    // /* */ console.log('Completed: ' + token.string);
+    addToHistory(token.word);
   }
 
   $Tokens.onToken(onWord);
@@ -346,8 +411,8 @@ $(function() {
     'ß': '<span class="raise">_</span><span>-</span>'
   };
 
-  var $HintLetter = $('.hint--letter');
-  var $HintKey = $('.hint--key');
+  var $HintLetter = $('.hint__letter');
+  var $HintKey = $('.hint__key');
   var $Hint = $('.hint');
 
   function showHint() {
