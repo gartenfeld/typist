@@ -3,7 +3,8 @@
     'to',
     'sing',
     'x',
-    'notebook'
+    'notebook',
+    'penny'
   ];
   var places = [
     'usa',
@@ -26,6 +27,7 @@
     'boris',
     'brandon',
     'conor',
+    'david',
     'eric',
     'fiona',
     'gail',
@@ -34,6 +36,8 @@
     'gordon',
     'graham',
     'harold',
+    'harry',
+    'potter',
     'henry',
     'hill',
     'ian',
@@ -41,11 +45,15 @@
     'john',
     'jonathan',
     'katrina',
+    'lisa',
     'margret',
     'maria',
     'mario',
+    'miller',
     'neil',
+    'olivia',
     'paul',
+    'peter',
     'picasso',
     'rob',
     'robert',

@@ -11,7 +11,7 @@ $(function() {
   var FULL_DATA_PATH = 'lib/vt.js';
   var FILE_TYPE = '.mp3';
   var LINE_LIMIT = 33;
-  var HISTORY_LIMIT = 18;
+  var HISTORY_LIMIT = 17;
 
   ///// Modules /////
 
@@ -218,17 +218,19 @@ $(function() {
   var $Tokens = TokensService();
 
   var capHistoryLength = (function() {
-    var $last;
+    var $bin = [];
     var $listed = {};
     return function capHistoryLength(word) {
-      if ($last) { $last.remove(); }
-      var words = $History.find('.word');
+      $bin.forEach(function($item) { $item.remove(); });
+      $bin = [];
       if (word.key in $listed) {
-        $last = $listed[word.key].fadeOut();
-      } else if (words.length > HISTORY_LIMIT) {
-        $last = words.last().fadeOut();
+        $bin.push($listed[word.key].fadeOut());
       }
       $listed[word.key] = word.$el;
+      var words = $History.find('.word');
+      while (words.length > HISTORY_LIMIT) {
+        $bin.push($(words.splice(-1, 1)).fadeOut());
+      }
     };
   })();
 
