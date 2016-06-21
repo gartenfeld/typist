@@ -10,7 +10,7 @@ $(function() {
   var RESOURCE_DIR = 'https://dbx.firebaseapp.com/audio/vt/';
   var FULL_DATA_PATH = 'lib/vt.js';
   var FILE_TYPE = '.mp3';
-  var LINE_LIMIT = 36;
+  var LINE_LIMIT = 33;
   var HISTORY_LIMIT = 18;
 
   ///// Modules /////
@@ -219,18 +219,21 @@ $(function() {
 
   var capHistoryLength = (function() {
     var $last;
-    return function capHistoryLength() {
+    var $listed = {};
+    return function capHistoryLength(word) {
       if ($last) { $last.remove(); }
       var words = $History.find('.word');
-      if (words.length > HISTORY_LIMIT) {
-        $last = words.last();
-        $last.fadeOut();
+      if (word.key in $listed) {
+        $last = $listed[word.key].fadeOut();
+      } else if (words.length > HISTORY_LIMIT) {
+        $last = words.last().fadeOut();
       }
+      $listed[word.key] = word.$el;
     };
   })();
 
   function addToHistory(word) {
-    capHistoryLength();
+    capHistoryLength(word);
     $History.prepend(word.$el.hide());
     word.$el.slideDown();
   }
@@ -238,7 +241,6 @@ $(function() {
   function onWord(token) {
     if (!token.word.isActive()) {
       token.reveal();
-      addToHistory(token.word);
     }
   }
 

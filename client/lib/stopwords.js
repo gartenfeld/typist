@@ -11,7 +11,9 @@
     'las',
     'vegas',
     'kent',
-    'kansas'
+    'kansas',
+    'buckingham',
+    'palace'
   ];
   var names = [
     'alexander',
@@ -53,6 +55,7 @@
     'stewart',
     'sue',
     'susanna',
+    'tess',
     'tom',
     'wilsons'
   ];
