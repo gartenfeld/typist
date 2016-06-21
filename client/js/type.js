@@ -224,11 +224,11 @@ $(function() {
       $bin.forEach(function($item) { $item.remove(); });
       $bin = [];
       if (word.key in $listed) {
-        $bin.push($listed[word.key].fadeOut());
+        $bin.push($listed[word.key].slideUp());
       }
       $listed[word.key] = word.$el;
       var words = $History.find('.word');
-      while (words.length > HISTORY_LIMIT) {
+      while (words.length - $bin.length > HISTORY_LIMIT) {
         $bin.push($(words.splice(-1, 1)).fadeOut());
       }
     };
