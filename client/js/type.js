@@ -268,6 +268,7 @@ $(function() {
     $('#stage').css({marginLeft: '7%'});
   }
   if (isMobile()) {
+    $('#panel').hide();
     displaySpecialMessage(MOBILE_MESSAGE);
     return;
   }
