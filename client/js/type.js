@@ -1,6 +1,7 @@
 soundManager.setup({
   url: 'lib/swf/',
-  preferFlash: false
+  preferFlash: false,
+  debugMode: false,
 });
 
 $(function() {
@@ -449,8 +450,24 @@ $(function() {
 
   var CONTROLS = {
     27: toggleAudio,
-    39: loadAnotherEntry
+    39: loadAnotherEntry,
+    38: increasePlayrate,
+    40: decreasePlayrate
   };
+
+  var PLAYRATE = 1;
+  function increasePlayrate() {
+    if (PLAYRATE < 2) {
+      PLAYRATE += 0.25;
+      soundManager.setPlaybackRate('voice', PLAYRATE);
+    }
+  }
+  function decreasePlayrate() {
+    if (PLAYRATE > 0.5) {
+      PLAYRATE -= 0.25;
+      soundManager.setPlaybackRate('voice', PLAYRATE);
+    }
+  }
 
   function isIgnoredKey(which) {
     if (which === 0 || KEY_MAP[which]) {
@@ -484,10 +501,5 @@ $(function() {
   var payload = document.createElement('script');
   payload.src = FULL_DATA_PATH;
   document.head.appendChild(payload);
-
-  /**
-   * Experimental Feature
-   */
-  // $Audio._a.playbackRate = 1
 
 });
