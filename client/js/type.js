@@ -264,13 +264,15 @@ $(function() {
   function displaySpecialMessage(message) {
     renderSentence(tilesFromText(message));
     $('.character').attr('class', 'character apparent blink');
+  }
+  function hideStageControls() {
     $('.banner').hide();
-    $('.panel').hide();
     $('#stage').css({marginLeft: '7%'});
+    $('#panel').hide();
   }
   if (isMobile()) {
-    $('#panel').hide();
     displaySpecialMessage(MOBILE_MESSAGE);
+    hideStageControls();
     return;
   }
 
@@ -493,8 +495,11 @@ $(function() {
     onIncorrectKey(pressed);
   });
 
-  ///// Bootstraping Call /////
-  loadAnotherEntry();
+  ///// Initial user action is required to play audio /////
+  var START_MESSAGE = "Press the right arrow key to start.";
+  displaySpecialMessage(START_MESSAGE);
+  $History.empty();
+
   /////////////////////////////
 
   // Load the full data asynchronously
