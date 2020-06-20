@@ -366,35 +366,26 @@ $(function() {
     };
   })();
 
-  // ß: 189 ½ -
-  // Ä: 222 Þ '
-  // Ö: 186 º ;
-  // Ü: 219 Û [
-  // Z <==> Y
-
   var KEY_MAP = {
-     59: 'ö',
-     63: 'ß',
-     89: 'z',
-     90: 'y',
-    173: 'ß',
-    186: 'ö',
-    189: 'ß',
-    219: 'ü',
-    222: 'ä'
+    '\'': 'ä',
+    '\"': 'ä',
+     ';': 'ö',
+     ':': 'ö',
+     '-': 'ß',
+     '[': 'ü',
+     '{': 'ü',
+     'y': 'z',
+     'z': 'y'
   };
 
-  function isCorrectKey(which) {
+  function isCorrectKey(pressedKey) {
     var expected = $focusTile.char.toLowerCase();
-    var actual = String.fromCharCode(which);
-    if (actual.toLowerCase() === expected) {
+    var actual = pressedKey.toLowerCase();
+    if (actual === expected) {
       return true;
     }
-    if (KEY_MAP[which] === expected) {
+    if (KEY_MAP[actual] === expected) {
       return true;
-    }
-    if (which === 0) {
-      return true; // German keyboard on Firefox
     }
     return false;
   }
@@ -451,10 +442,10 @@ $(function() {
   }
 
   var CONTROLS = {
-    27: toggleAudio,
-    39: loadAnotherEntry,
-    38: increasePlaybackRate,
-    40: decreasePlaybackRate
+    'Escape': toggleAudio,
+    'ArrowRight': loadAnotherEntry,
+    'ArrowUp': increasePlaybackRate,
+    'ArrowDown': decreasePlaybackRate
   };
 
   var PLAYBACK_RATE = 1;
@@ -471,28 +462,23 @@ $(function() {
     }
   }
 
-  function isIgnoredKey(which) {
-    if (which === 0 || KEY_MAP[which]) {
-      return false;
-    }
-    return which < 65 || which > 90;
-  }
-
-  $('body').keydown(function(ev) {
-    ev.preventDefault();
-    var pressed = ev.which || ev.keyCode;
-    if (pressed in CONTROLS) {
-      CONTROLS[pressed]();
+  $('body').keydown(function(event) {
+    if (event.key in CONTROLS) {
+      CONTROLS[event.key]();
       return;
     }
-    if (isIgnoredKey(pressed)) {
+    if (event.metaKey || event.ctrlKey) {
       return;
     }
-    if (isCorrectKey(pressed)) {
+    if (!$focusTile) {
+      return;
+    }
+    event.preventDefault();
+    if (isCorrectKey(event.key)) {
       onCorrectKey();
       return;
     }
-    onIncorrectKey(pressed);
+    onIncorrectKey();
   });
 
   ///// Initial user action is required to play audio /////
