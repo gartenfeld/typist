@@ -17,10 +17,10 @@ $(function() {
   ///// Modules /////
 
   var ANY_EN_LETTER = /^[a-zA-Z]$/;
-  var AND_DE_LETTER = /^[\u00C4\u00E4\u00D6\u00F6\u00DC\u00FC\u00DF]$/;
+  var ANY_DE_LETTER = /^[\u00C4\u00E4\u00D6\u00F6\u00DC\u00FC\u00DF]$/;
 
   function isAlpha(char) {
-    return ANY_EN_LETTER.test(char) || AND_DE_LETTER.test(char);
+    return ANY_EN_LETTER.test(char) || ANY_DE_LETTER.test(char);
   }
 
   ///// Tile Class /////
@@ -204,19 +204,19 @@ $(function() {
 
   ///// App Globals /////
 
-  var $Audio = soundManager.createSound({
+  var $audio = soundManager.createSound({
     id: 'voice',
     volume: 60,
     stream: true
   });
 
-  var $Focus;
-  var $Sentence = $('#sentence');
-  var $Translation = $('#translation');
-  var $Backdrop = $('#backdrop');
-  var $History = $('#history');
+  var $focusTile;
+  var $sentence = $('#sentence');
+  var $translation = $('#translation');
+  var $backdrop = $('#backdrop');
+  var $history = $('#history');
 
-  var $Tokens = TokensService();
+  var $tokens = TokensService();
 
   var capHistoryLength = (function() {
     var $bin = [];
@@ -228,7 +228,7 @@ $(function() {
         $bin.push($listed[word.key].slideUp());
       }
       $listed[word.key] = word.$el;
-      var words = $History.find('.word');
+      var words = $history.find('.word');
       while (words.length - $bin.length > HISTORY_LIMIT) {
         $bin.push($(words.splice(-1, 1)).fadeOut());
       }
@@ -237,7 +237,7 @@ $(function() {
 
   function addToHistory(word) {
     capHistoryLength(word);
-    $History.prepend(word.$el.hide());
+    $history.prepend(word.$el.hide());
     word.$el.slideDown();
   }
 
@@ -251,8 +251,8 @@ $(function() {
     addToHistory(token.word);
   }
 
-  $Tokens.onToken(onWord);
-  $Tokens.onTokenComplete(onWordComplete);
+  $tokens.onToken(onWord);
+  $tokens.onTokenComplete(onWordComplete);
 
   ///// /////
 
@@ -267,7 +267,7 @@ $(function() {
   }
   function hideStageControls() {
     $('.banner').hide();
-    $('#stage').css({marginLeft: '7%'});
+    $('#stage').css({ marginLeft: '7%' });
     $('#panel').hide();
   }
   if (isMobile()) {
@@ -293,15 +293,15 @@ $(function() {
   function tilesFromText(sentence) {
     var lines = wrapText(sentence, LINE_LIMIT);
     return lines.map(function(line) {
-      return $Tokens.makeTilesForLine(line);
+      return $tokens.makeTilesForLine(line);
     });
   }
 
   function renderSentence(lines) {
-    $Sentence.empty();
+    $sentence.empty();
     lines.forEach(function(line, l) {
       $line = $('<div></div>', {class: 'line'});
-      $Sentence.append($line);
+      $sentence.append($line);
       line.forEach(function(tile, c) {
         tile.$el.appendTo($line);
         tile.$el.hide()
@@ -321,15 +321,15 @@ $(function() {
 
   function setFocusOn($tile) {
     var id = $tile.attr('data-id');
-    var tile = $Tokens.getTileById(id);
-    $Focus = tile.focus();
+    var tile = $tokens.getTileById(id);
+    $focusTile = tile.focus();
   }
 
   function onSentenceCompleted() {
-    $Audio.stop();
+    $audio.stop();
     var timer = setTimeout(function() {
       clearTimeout(timer);
-      $Audio.play({
+      $audio.play({
         onfinish: loadAnotherEntry
       });
     }, 0);
@@ -342,12 +342,12 @@ $(function() {
 
   function loadAnotherEntry() {
     var entry = fetchEntryData();
-    $Tokens.reset();
-    $Audio.play({ 
+    $tokens.reset();
+    $audio.play({ 
       url: RESOURCE_DIR + entry.f + FILE_TYPE,
       loops: 200
     });
-    $Translation.text(entry.en);
+    $translation.text(entry.en);
     var marquee = tilesFromText(entry.de);
     renderSentence(marquee);
     nextAction();
@@ -385,12 +385,12 @@ $(function() {
   };
 
   function isCorrectKey(which) {
-    var truth = $Focus.char.toLowerCase();
-    var asserted = String.fromCharCode(which);
-    if (asserted.toLowerCase() === truth) {
+    var expected = $focusTile.char.toLowerCase();
+    var actual = String.fromCharCode(which);
+    if (actual.toLowerCase() === expected) {
       return true;
     }
-    if (KEY_MAP[which] === truth) {
+    if (KEY_MAP[which] === expected) {
       return true;
     }
     if (which === 0) {
@@ -399,17 +399,17 @@ $(function() {
     return false;
   }
 
-  var $ErrorCount = 0;
+  var $errorCount = 0;
 
   function onCorrectKey() {
-    $ErrorCount = 0;
-    $Focus.show().unfocus();
+    $errorCount = 0;
+    $focusTile.show().unfocus();
     nextAction();
   }
 
   function flashScreen() {
-    $Backdrop.css({ opacity: 0.5 });
-    hideElement('backdrop', 45, $Backdrop);
+    $backdrop.css({ opacity: 0.5 });
+    hideElement('backdrop', 45, $backdrop);
   }
 
   var DE_KEYS = {
@@ -419,55 +419,55 @@ $(function() {
     'ß': '<span class="raise">_</span><span>-</span>'
   };
 
-  var $HintLetter = $('.hint__letter');
-  var $HintKey = $('.hint__key');
-  var $Hint = $('.hint');
+  var $hintLetter = $('.hint__letter');
+  var $hintKey = $('.hint__key');
+  var $hint = $('.hint');
 
   function showHint() {
-    $Hint.css({ opacity: 1 });
-    hideElement('hint', 2000, $Hint);
+    $hint.css({ opacity: 1 });
+    hideElement('hint', 2000, $hint);
   }
 
-  function onIncorrectKey(which) {
-    var truth = $Focus.char.toLowerCase();
-    if (truth in DE_KEYS) {
-      $HintLetter.text(truth);
-      $HintKey.html(DE_KEYS[truth]);
+  function onIncorrectKey() {
+    var expected = $focusTile.char.toLowerCase();
+    if (expected in DE_KEYS) {
+      $hintLetter.text(expected);
+      $hintKey.html(DE_KEYS[expected]);
       showHint();
       return;
     }
-    if ($ErrorCount > 2) {
+    if ($errorCount > 2) {
       onCorrectKey();
       return;
     }
-    $ErrorCount++;
+    $errorCount++;
     flashScreen(); 
   }
 
   function toggleAudio() {
     soundManager.togglePause('voice');
-    var actionText = $Audio.paused ? 'resume' : 'pause';
+    var actionText = $audio.paused ? 'resume' : 'pause';
     $('#toggle-action').text(actionText);
   }
 
   var CONTROLS = {
     27: toggleAudio,
     39: loadAnotherEntry,
-    38: increasePlayrate,
-    40: decreasePlayrate
+    38: increasePlaybackRate,
+    40: decreasePlaybackRate
   };
 
-  var PLAYRATE = 1;
-  function increasePlayrate() {
-    if (PLAYRATE < 2) {
-      PLAYRATE += 0.25;
-      soundManager.setPlaybackRate('voice', PLAYRATE);
+  var PLAYBACK_RATE = 1;
+  function increasePlaybackRate() {
+    if (PLAYBACK_RATE < 2) {
+      PLAYBACK_RATE += 0.25;
+      soundManager.setPlaybackRate('voice', PLAYBACK_RATE);
     }
   }
-  function decreasePlayrate() {
-    if (PLAYRATE > 0.5) {
-      PLAYRATE -= 0.25;
-      soundManager.setPlaybackRate('voice', PLAYRATE);
+  function decreasePlaybackRate() {
+    if (PLAYBACK_RATE > 0.5) {
+      PLAYBACK_RATE -= 0.25;
+      soundManager.setPlaybackRate('voice', PLAYBACK_RATE);
     }
   }
 
@@ -498,7 +498,7 @@ $(function() {
   ///// Initial user action is required to play audio /////
   var START_MESSAGE = "Press the right arrow key to start.";
   displaySpecialMessage(START_MESSAGE);
-  $History.empty();
+  $history.empty();
 
   /////////////////////////////
 
