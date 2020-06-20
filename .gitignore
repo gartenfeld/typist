@@ -6,3 +6,4 @@ swf/
 *.full.js
 sample.js
 vt.js
+.firebase

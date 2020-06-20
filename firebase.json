@@ -1,10 +1,11 @@
 {
-  "firebase": "vok",
-  "public": "client",
-  "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/audio/**",
-    "**/node_modules/**"
-  ]
+  "hosting": {
+    "public": "client",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/audio/**",
+      "**/node_modules/**"
+    ]
+  }
 }
